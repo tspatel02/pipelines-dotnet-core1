@@ -33,6 +33,6 @@ steps:
   inputs:
     azureSubscription: 'Azure subscription 1(6d308cf6-c494-45e0-9eba-89af42f3ed67)'
     appType: 'webApp'
-    appName: 'tomweb'
+    appName: 'tom1'
     package: '$(Build.ArtifactStagingDirectory)/app.zip'
     deploymentMethod: 'auto'
