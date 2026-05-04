@@ -2,7 +2,7 @@ trigger:
 - main
 
 pool:
-  name: Default   # <-- your self-hosted pool name
+  name: Default   # <-- your self-hosted Windows agent pool
 
 variables:
   buildConfiguration: 'Release'
@@ -10,7 +10,7 @@ variables:
 steps:
 
 # -------------------------------
-# Install correct .NET SDK
+# Install .NET SDK (important fix)
 # -------------------------------
 - task: UseDotNet@2
   inputs:
@@ -19,27 +19,26 @@ steps:
 
 # -------------------------------
 # Restore dependencies
-# (NO csproj hardcoding needed)
 # -------------------------------
 - script: dotnet restore
-  displayName: Restore dependencies
+  displayName: Restore
 
 # -------------------------------
 # Build project
 # -------------------------------
 - script: dotnet build --configuration $(buildConfiguration)
-  displayName: Build project
+  displayName: Build
 
 # -------------------------------
-# Publish project (IMPORTANT FIX)
+# Publish project (correct output)
 # -------------------------------
 - script: dotnet publish --configuration $(buildConfiguration) --output publish_output
-  displayName: Publish project
+  displayName: Publish
 
 # -------------------------------
-# Verify output (DEBUG STEP)
+# Verify publish output (WINDOWS FIXED)
 # -------------------------------
-- script: ls -R publish_output
+- script: dir publish_output /s
   displayName: Verify publish output
 
 # -------------------------------
