@@ -2,62 +2,43 @@ trigger:
 - main
 
 pool:
-  name: Default   # <-- your self-hosted Windows agent pool
+  name: Default
 
 variables:
   buildConfiguration: 'Release'
 
 steps:
 
-# -------------------------------
-# Install .NET SDK (important fix)
-# -------------------------------
 - task: UseDotNet@2
   inputs:
-    packageType: 'sdk'
-    version: '8.x'
+    packageType: sdk
+    version: 8.x
 
-# -------------------------------
-# Restore dependencies
-# -------------------------------
+- script: dotnet clean
+  displayName: Clean
+
 - script: dotnet restore
   displayName: Restore
 
-# -------------------------------
-# Build project
-# -------------------------------
-- script: dotnet build --configuration $(buildConfiguration)
-  displayName: Build
-
-# -------------------------------
-# Publish project (correct output)
-# -------------------------------
-- script: dotnet publish --configuration $(buildConfiguration) --output publish_output
+- script: |
+    dotnet publish -c $(buildConfiguration) -o publish_output --no-restore
   displayName: Publish
 
-# -------------------------------
-# Verify publish output (WINDOWS FIXED)
-# -------------------------------
 - script: dir publish_output /s
-  displayName: Verify publish output
+  displayName: Verify output
 
-# -------------------------------
-# Zip published output
-# -------------------------------
 - task: ArchiveFiles@2
   inputs:
     rootFolderOrFile: 'publish_output'
     includeRootFolder: false
-    archiveType: 'zip'
+    archiveType: zip
     archiveFile: '$(Build.ArtifactStagingDirectory)/app.zip'
     replaceExistingArchive: true
 
-# -------------------------------
-# Deploy to Azure Web App (Linux)
-# -------------------------------
 - task: AzureWebApp@1
   inputs:
     azureSubscription: 'Azure subscription 1(fcbc5c99-308d-47ee-9f19-c7f282444dc6)'
-    appType: 'webAppLinux'
-    appName: 'tusweb1'
+    appType: webAppLinux
+    appName: tusweb1
     package: '$(Build.ArtifactStagingDirectory)/app.zip'
+    deploymentMethod: zipDeploy
