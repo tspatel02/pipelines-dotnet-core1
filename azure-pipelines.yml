@@ -2,7 +2,7 @@ trigger:
 - main
 
 pool:
-  vmImage: Default   # or your self-hosted pool name
+  name: Default   # your self-hosted pool
 
 variables:
   buildConfiguration: 'Release'
@@ -11,7 +11,7 @@ steps:
 - task: UseDotNet@2
   inputs:
     packageType: 'sdk'
-    version: '9.0'   # IMPORTANT: must match your app target
+    version: '8.x'
 
 - script: dotnet restore
   displayName: Restore
