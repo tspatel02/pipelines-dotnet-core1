@@ -2,12 +2,17 @@ trigger:
 - main
 
 pool:
-  name: Default
+  vmImage: ubuntu-latest   # or your self-hosted pool name
 
 variables:
   buildConfiguration: 'Release'
 
 steps:
+- task: UseDotNet@2
+  inputs:
+    packageType: 'sdk'
+    version: '8.x'   # IMPORTANT: must match your app target
+
 - script: dotnet restore
   displayName: Restore
 
@@ -28,6 +33,6 @@ steps:
 - task: AzureWebApp@1
   inputs:
     azureSubscription: 'Azure subscription 1(fcbc5c99-308d-47ee-9f19-c7f282444dc6)'
-    appType: 'webApp'
+    appType: 'webAppLinux'
     appName: 'tusweb1'
     package: '$(Build.ArtifactStagingDirectory)/app.zip'
