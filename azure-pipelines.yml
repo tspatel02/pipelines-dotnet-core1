@@ -11,7 +11,7 @@ steps:
 - task: UseDotNet@2
   inputs:
     packageType: 'sdk'
-    version: '8.x'   # IMPORTANT: must match your app target
+    version: '9.0'   # IMPORTANT: must match your app target
 
 - script: dotnet restore
   displayName: Restore
