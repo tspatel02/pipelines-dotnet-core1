@@ -2,36 +2,49 @@ trigger:
 - main
 
 pool:
-  name: Default   # your self-hosted pool
+  name: Default   # <-- your self-hosted pool name
 
 variables:
   buildConfiguration: 'Release'
 
 steps:
 
-# Install correct SDK on agent
+# -------------------------------
+# Install correct .NET SDK
+# -------------------------------
 - task: UseDotNet@2
   inputs:
     packageType: 'sdk'
     version: '8.x'
 
-# Restore packages
-- script: dotnet restore YourProject.csproj
-  displayName: Restore
+# -------------------------------
+# Restore dependencies
+# (NO csproj hardcoding needed)
+# -------------------------------
+- script: dotnet restore
+  displayName: Restore dependencies
 
+# -------------------------------
 # Build project
-- script: dotnet build YourProject.csproj --configuration $(buildConfiguration)
-  displayName: Build
+# -------------------------------
+- script: dotnet build --configuration $(buildConfiguration)
+  displayName: Build project
 
-# Publish CORRECT project (important fix)
-- script: dotnet publish YourProject.csproj -c $(buildConfiguration) -o publish_output
-  displayName: Publish
+# -------------------------------
+# Publish project (IMPORTANT FIX)
+# -------------------------------
+- script: dotnet publish --configuration $(buildConfiguration) --output publish_output
+  displayName: Publish project
 
-# Debug output (VERY IMPORTANT CHECK)
+# -------------------------------
+# Verify output (DEBUG STEP)
+# -------------------------------
 - script: ls -R publish_output
-  displayName: Verify Publish Output
+  displayName: Verify publish output
 
-# Zip output
+# -------------------------------
+# Zip published output
+# -------------------------------
 - task: ArchiveFiles@2
   inputs:
     rootFolderOrFile: 'publish_output'
@@ -40,7 +53,9 @@ steps:
     archiveFile: '$(Build.ArtifactStagingDirectory)/app.zip'
     replaceExistingArchive: true
 
-# Deploy to Azure
+# -------------------------------
+# Deploy to Azure Web App (Linux)
+# -------------------------------
 - task: AzureWebApp@1
   inputs:
     azureSubscription: 'Azure subscription 1(fcbc5c99-308d-47ee-9f19-c7f282444dc6)'
